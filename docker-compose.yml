@@ -1,0 +1,62 @@
+version: "3"
+
+services:
+  php56:
+    container_name: php56
+    build: ./docker/php
+    environment:
+      APP_ENV: "development"
+      APP_DEBUG: "true"
+      LOG_CHANNEL: "stderr"
+      # DB_CONNECTION: "pgsql"
+      # DB_HOST: "db"
+      # DB_PORT: "5433"
+      # DB_DATABASE: "docker"
+      # DB_USERNAME: "docker"
+      # DB_PASSWORD: "docker"
+    volumes:
+      - ./server:/var/www
+    expose:
+      - 9000
+    # depends_on:
+    #   - db
+
+  apache2:
+    image: httpd:2.4.20
+    container_name: apache
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - ./server:/var/www/html
+      - ./docker/apache:/usr/local/apache2/conf
+      # - ./docker/apache/ssl:/etc/apache/ssl
+    depends_on:
+      - centos
+
+  centos72:
+    image: centos:centos7.4.1708
+    container_name: centos72
+    # ports:
+    # - 80:80
+    # - 443:443
+    # volumes:
+    #   - ./server:/var/www
+    #   - ./docker/apache/httpd.conf:/etc/apache/conf.d/httpd.conf
+    #   - ./docker/apache/ssl:/etc/apache/ssl
+    depends_on:
+      - app
+
+  # db:
+  #   image: postgres:12
+  #   container_name: db
+  #   environment:
+  #     TZ: "Asia/Tokyo"
+  #     POSTGRES_DB: "docker"
+  #     POSTGRES_USER: "docker"
+  #     POSTGRES_PASSWORD: "docker"
+  #   volumes:
+  #     - ./docker/db/data:/var/lib/postgresql/data
+  #     - ./docker/db/sql:/docker-entrypoint-initdb.d
+  #   ports:
+  #     - 5433:5432
